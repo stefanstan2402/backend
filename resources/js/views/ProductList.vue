@@ -2,6 +2,13 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import api from "../services/api";
+import DataTable from "../components/DataTable.vue";
+
+interface Category {
+    id: number;
+    name: string;
+    description?: string;
+}
 
 const products = ref([]);
 const pagination = ref({ current_page: 1, last_page: 1 });
@@ -23,7 +30,10 @@ const deleteProduct = async (id) => {
     }
 };
 
-onMounted(() => fetchProducts());
+onMounted(async() => {
+    await fetchProducts();
+});
+
 </script>
 
 <template>
@@ -37,50 +47,33 @@ onMounted(() => fetchProducts());
             + Add Product
         </button>
 
-        <table class="w-full border-collapse border table table-hover">
-            <thead>
-            <tr class="bg-gray-200">
-                <th class="border px-2 py-1">Name</th>
-                <th class="border px-2 py-1">Price</th>
-                <th class="border px-2 py-1">Stock</th>
-                <th class="border px-2 py-1">Category</th>
-                <th class="border px-2 py-1">Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="p in products" :key="p.id">
-                <td class="border px-2 py-1">{{ p.name }}</td>
-                <td class="border px-2 py-1">{{ p.price }}</td>
-                <td class="border px-2 py-1">{{ p.stock }}</td>
-                <td class="border px-2 py-1">{{ p.category?.name }}</td>
-                <td class="border px-2 py-1 flex gap-2">
-                    <button
-                        @click="router.push(`/products/${p.id}/edit`)"
-                        class="bg-blue-500 px-2 mx-1 py-1 rounded btn btn-warning"
-                    >
-                        Edit
-                    </button>
-                    <button
-                        @click="deleteProduct(p.id)"
-                        class="bg-red-500  px-2 py-1 rounded btn btn-danger mx-1"
-                    >
-                        Delete
-                    </button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <DataTable
+            :columns="[
+                { key: 'name', label: 'Name' },
+                { key: 'price', label: 'Price' },
+                { key: 'stock', label: 'Stock' },
+                { key: 'category.name', label: 'Category' }
+            ]"
+            :rows="products"
+            :pagination="pagination"
+            :loading="loading"
+            :onPageChange="fetchProducts"
+        >
+            <template #actions="{ row }">
+                <button
+                    @click="router.push(`/products/${row.id}/edit`)"
+                    class="bg-blue-500 px-2 py-1 rounded btn btn-warning mx-1"
+                >
+                    Edit
+                </button>
+                <button
+                    @click="deleteProduct(row.id)"
+                    class="bg-red-500 px-2 py-1 rounded btn btn-danger mx-1"
+                >
+                    Delete
+                </button>
+            </template>
+        </DataTable>
 
-        <!-- Pagination -->
-        <div class="mt-4 flex gap-2">
-            <button
-                v-for="page in pagination.last_page"
-                :key="page"
-                @click="fetchProducts(page)"
-                :class="['px-3 py-1 rounded', page === pagination.current_page ? 'text-black' : 'text-white']"
-            >
-                {{ page }}
-            </button>
-        </div>
     </div>
 </template>
