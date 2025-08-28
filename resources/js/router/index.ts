@@ -1,10 +1,10 @@
-import { createRouter, createWebHistory } from "vue-router";
+import {createRouter, createWebHistory, RouteRecordRaw} from "vue-router";
 import CategoryList from "../views/CategoryList.vue";
 import CategoryForm from "../views/CategoryForm.vue";
 import ProductList from "../views/ProductList.vue";
 import ProductForm from "../views/ProductForm.vue";
 
-const routes = [
+const routes: Readonly<RouteRecordRaw[]> = [
     { path: "/", redirect: "/categories" },
     { path: "/categories", component: CategoryList },
     { path: "/categories/new", component: CategoryForm },
