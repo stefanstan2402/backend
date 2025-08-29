@@ -1,49 +1,3 @@
-<script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import api from "../services/api";
-
-const route = useRoute();
-const router = useRouter();
-const isEdit = ref(false);
-
-const form = ref({ name: "", price: "", stock: "", category_id: "" });
-const categories = ref([]);
-
-const fetchCategories = async () => {
-    try {
-        const { data } = await api.get("/categories");
-        categories.value = data.data;
-    } catch (err) {
-        console.error(err);
-    }
-};
-
-onMounted(async () => {
-    await fetchCategories();
-
-    if (route.params.id) {
-        isEdit.value = true;
-        const { data } = await api.get(`/products/${route.params.id}`);
-        form.value = {
-            name: data.name,
-            price: data.price,
-            stock: data.stock,
-            category_id: data.category_id,
-        };
-    }
-});
-
-const saveProduct = async () => {
-    if (isEdit.value) {
-        await api.put(`/products/${route.params.id}`, form.value);
-    } else {
-        await api.post("/products", form.value);
-    }
-    await router.push("/products");
-};
-</script>
-
 <template>
     <div class="container mt-5">
         <h2 class="mb-4">
@@ -99,3 +53,49 @@ const saveProduct = async () => {
         </form>
     </div>
 </template>
+
+<script setup lang="ts">
+import { ref, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import api from "../services/api";
+
+const route = useRoute();
+const router = useRouter();
+const isEdit = ref(false);
+
+const form = ref({ name: "", price: "", stock: "", category_id: "" });
+const categories = ref([]);
+
+const fetchCategories = async () => {
+    try {
+        const { data } = await api.get("/categories");
+        categories.value = data.data;
+    } catch (err) {
+        console.error(err);
+    }
+};
+
+onMounted(async () => {
+    await fetchCategories();
+
+    if (route.params.id) {
+        isEdit.value = true;
+        const { data } = await api.get(`/products/${route.params.id}`);
+        form.value = {
+            name: data.name,
+            price: data.price,
+            stock: data.stock,
+            category_id: data.category_id,
+        };
+    }
+});
+
+const saveProduct = async () => {
+    if (isEdit.value) {
+        await api.put(`/products/${route.params.id}`, form.value);
+    } else {
+        await api.post("/products", form.value);
+    }
+    await router.push("/products");
+};
+</script>

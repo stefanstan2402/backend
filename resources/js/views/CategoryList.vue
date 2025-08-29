@@ -18,7 +18,9 @@ const router = useRouter();
 const fetchCategories = async (page = 1) => {
     loading.value = true;
     try {
-        const { data } = await api.get(`/categories?page=${page}`);
+        const { data } = await api.post(`/categories/get?page=${page}`, {
+            // parameters here
+        });
         categories.value = data.data || [];
         pagination.value = {
             current_page: data.current_page,

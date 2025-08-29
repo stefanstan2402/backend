@@ -7,3 +7,6 @@ use App\Http\Controllers\ProductController;
 Route::apiResource('categories', CategoryController::class);
 Route::apiResource('products', ProductController::class);
 
+Route::post('categories/get', [CategoryController::class, 'filter']);
+Route::post('products/get', [ProductController::class, 'filter']);
+

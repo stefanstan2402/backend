@@ -6,6 +6,7 @@ use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Http\Services\CategoryService;
 use App\Models\Category;
+use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
@@ -18,7 +19,15 @@ class CategoryController extends Controller
 
     public function index()
     {
-        return $this->categoryService->listPaginated(10);
+        return $this->categoryService->listAll();
+    }
+
+    public function filter(Request $request)
+    {
+        $filters = $request->only(['name', 'description']);
+        $perPage = $request->input('per_page', 10);
+
+        return $this->categoryService->listPaginated($filters, $perPage);
     }
 
     public function store(StoreCategoryRequest $request)

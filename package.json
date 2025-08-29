@@ -17,6 +17,7 @@
     "dependencies": {
         "@kyvg/vue3-notification": "^3.4.1",
         "@vitejs/plugin-vue": "^6.0.1",
+        "primevue": "^4.3.7",
         "vue": "^3.5.20",
         "vue-router": "^4.5.1"
     }

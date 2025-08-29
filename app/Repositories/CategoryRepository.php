@@ -6,11 +6,24 @@ use App\Models\Category;
 
 class CategoryRepository
 {
-    public function allPaginated(int $perPage = 10)
+    public function allPaginated(array $filters = [], int $perPage = 10)
     {
-        return Category::query()
-            ->orderBy('name')
-            ->paginate($perPage);
+        $query = Category::query();
+
+        if (!empty($filters['name'])) {
+            $query->withName($filters['name']);
+        }
+
+        if (!empty($filters['description'])) {
+            $query->withDescription($filters['description']);
+        }
+
+        return $query->orderBy('name')->paginate($perPage);
+    }
+
+    public function getAll()
+    {
+        return Category::query()->orderBy('name')->get();
     }
 
     public function create(array $data): Category
