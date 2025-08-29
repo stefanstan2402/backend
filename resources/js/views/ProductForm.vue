@@ -58,11 +58,13 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import api from "../services/api";
+import { useNotification } from "@kyvg/vue3-notification";
 
 const route = useRoute();
 const router = useRouter();
-const isEdit = ref(false);
+const { notify }  = useNotification()
 
+const isEdit = ref(false);
 const form = ref({ name: "", price: "", stock: "", category_id: "" });
 const categories = ref([]);
 
@@ -80,22 +82,45 @@ onMounted(async () => {
 
     if (route.params.id) {
         isEdit.value = true;
-        const { data } = await api.get(`/products/${route.params.id}`);
-        form.value = {
-            name: data.name,
-            price: data.price,
-            stock: data.stock,
-            category_id: data.category_id,
-        };
+        try{
+            const { data } = await api.get(`/products/${route.params.id}`);
+            form.value = {
+                name: data.name,
+                price: data.price,
+                stock: data.stock,
+                category_id: data.category_id,
+            };
+        } catch (error) {
+            console.error(error);
+            notify({
+                type: "error",
+                title: error.message,
+                text: "Eroare!",
+            });
+        }
     }
 });
 
 const saveProduct = async () => {
-    if (isEdit.value) {
-        await api.put(`/products/${route.params.id}`, form.value);
-    } else {
-        await api.post("/products", form.value);
+    try {
+        if (isEdit.value) {
+            await api.put(`/products/${route.params.id}`, form.value);
+        } else {
+            await api.post("/products", form.value);
+        }
+        notify({
+            type: "success",
+            title: "Modificarea a fost efectuata cu succes!",
+            text: "Success!",
+        });
+        await router.push("/products");
+    } catch (error) {
+        notify({
+            type: "error",
+            title: error.message,
+            text: "Eroare!",
+        });
     }
-    await router.push("/products");
+
 };
 </script>
