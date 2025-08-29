@@ -61,7 +61,7 @@ const nextPage = () => {
 </script>
 
 <template>
-    <div class="w-full">
+    <div class="w-full mx-5">
         <div v-if="loading" class="text-center py-4">Loading...</div>
 
         <table v-else class="table table-hover w-full border-collapse border">

@@ -3,6 +3,8 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import api from "../services/api";
 import DataTable from "../components/DataTable.vue";
+import FilterSidebar from "../components/FilterSidebar.vue"; // ⬅️ add
+import { filtersConfig } from "../config/filtersConfig";            // ⬅️ add
 
 interface Category {
     id: number;
@@ -15,11 +17,19 @@ const pagination = ref({ current_page: 1, last_page: 1 });
 const loading = ref(false);
 const router = useRouter();
 
+const filtersVisible = ref(false);
+const filters = ref<Record<string, any>>({});
+
+const filterFields = filtersConfig.categories ?? [
+    { field: "name", type: "text", label: "Name" },
+    { field: "description", type: "text", label: "Description" },
+];
+
 const fetchCategories = async (page = 1) => {
     loading.value = true;
     try {
         const { data } = await api.post(`/categories/get?page=${page}`, {
-            // parameters here
+            ...filters.value,
         });
         categories.value = data.data || [];
         pagination.value = {
@@ -29,6 +39,11 @@ const fetchCategories = async (page = 1) => {
     } finally {
         loading.value = false;
     }
+};
+
+const applyFilters = (newFilters: Record<string, any>) => {
+    filters.value = newFilters;
+    fetchCategories(1); // reset to first page on new filters
 };
 
 const deleteCategory = async (id: number) => {
@@ -43,14 +58,23 @@ onMounted(() => fetchCategories());
 
 <template>
     <div class="p-6">
-        <h2 class="text-2xl font-bold mb-4">Categories</h2>
+        <h2 class="text-2xl font-bold mb-4 mx-5">Categories</h2>
 
-        <button
-            @click="router.push('/categories/new')"
-            class="bg-green-500 px-3 py-1 rounded mb-4 btn btn-primary"
-        >
-            + Add Category
-        </button>
+        <div class="flex justify-between items-center mb-4 mx-5">
+            <button
+                @click="router.push('/categories/new')"
+                class="bg-green-500 px-3 py-1 rounded btn btn-success"
+            >
+                + Add Category
+            </button>
+
+            <button
+                @click="filtersVisible = true"
+                class="bg-gray-600 px-3 py-1 btn btn-secondary mx-1"
+            >
+                🔍 Filters
+            </button>
+        </div>
 
         <DataTable
             :columns="[
@@ -78,5 +102,14 @@ onMounted(() => fetchCategories());
                 </button>
             </template>
         </DataTable>
+
+        <!-- ⬇️ new: reusable filter sidebar -->
+        <FilterSidebar
+            :visible="filtersVisible"
+            :filters="filterFields"
+            :model-value="filters"
+            @apply="applyFilters"
+            @update:visible="v => (filtersVisible = v)"
+        />
     </div>
 </template>

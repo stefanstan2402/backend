@@ -69,7 +69,7 @@ const categories = ref([]);
 const fetchCategories = async () => {
     try {
         const { data } = await api.get("/categories");
-        categories.value = data.data;
+        categories.value = data;
     } catch (err) {
         console.error(err);
     }
