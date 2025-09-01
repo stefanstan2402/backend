@@ -14,11 +14,10 @@ class CategoryService
         $this->categoryRepository = $categoryRepository;
     }
 
-    public function listPaginated(array $filters = [], int $perPage = 10)
+    public function listPaginated(int $perPage = 10)
     {
-        return $this->categoryRepository->allPaginated($filters, $perPage);
+        return $this->categoryRepository->allPaginated($perPage);
     }
-
     public function listAll()
     {
         return $this->categoryRepository->getAll();

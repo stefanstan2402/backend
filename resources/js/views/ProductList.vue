@@ -4,6 +4,8 @@ import { useRouter } from "vue-router";
 import api from "../services/api";
 import DataTable from "../components/DataTable.vue";
 import FilterSidebar from "../components/FilterSidebar.vue";
+import { filtersConfig } from "../config/filtersConfig";
+import { buildQueryParams } from "../utils/queryBuilder";
 
 interface Category {
     id: number;
@@ -40,9 +42,12 @@ const fetchCategoriesForFilter = async () => {
 const fetchProducts = async (page = 1) => {
     loading.value = true;
     try {
-        const { data } = await api.post(`/products/get?page=${page}`, {
-            ...filters.value,
-        });
+        const params: Record<string, any> = {
+            page,
+            ...buildQueryParams(filters.value, filtersConfig.categories)
+        };
+
+        const { data } = await api.get("/products/get", { params });
         products.value = data.data;
         pagination.value = {
             current_page: data.current_page,

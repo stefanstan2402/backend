@@ -24,10 +24,8 @@ class CategoryController extends Controller
 
     public function filter(Request $request)
     {
-        $filters = $request->only(['name', 'description']);
         $perPage = $request->input('per_page', 10);
-
-        return $this->categoryService->listPaginated($filters, $perPage);
+        return $this->categoryService->listPaginated($perPage);
     }
 
     public function store(StoreCategoryRequest $request)

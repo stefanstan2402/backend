@@ -20,17 +20,13 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        $perPage = $request->get('page', 10);
-
-        return $this->productService->listPaginated([], $perPage);
+        return $this->productService->listAll();
     }
 
     public function filter(Request $request)
     {
-        $filters = $request->only(['name', 'price', 'stock', 'category_id']);
-        $perPage = $request->get('per_page', 10);
-
-        return $this->productService->listPaginated($filters, $perPage);
+        $perPage = $request->input('per_page', 10);
+        return $this->productService->listPaginated($perPage);
     }
 
     public function store(StoreProductRequest $request)

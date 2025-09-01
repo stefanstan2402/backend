@@ -16,9 +16,14 @@ class ProductService
         $this->productRepository = $productRepository;
     }
 
-    public function listPaginated(array $filters = [], int $perPaage = 10)
+    public function listPaginated(int $perPage = 10)
     {
-        return $this->productRepository->allPaginated($filters, $perPaage);
+        return $this->productRepository->allPaginated($perPage);
+    }
+
+    public function listAll()
+    {
+        return $this->productRepository->getAll();
     }
 
     public function create(StoreProductRequest $request)

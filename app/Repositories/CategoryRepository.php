@@ -3,37 +3,41 @@
 namespace App\Repositories;
 
 use App\Models\Category;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class CategoryRepository
 {
-    public function allPaginated(array $filters = [], int $perPage = 10)
+    private function getQuery()
     {
-        $query = Category::query();
-
-        if (!empty($filters['name'])) {
-            $query->withName($filters['name']);
-        }
-
-        if (!empty($filters['description'])) {
-            $query->withDescription($filters['description']);
-        }
-
-        return $query->orderBy('name')->paginate($perPage);
+        return QueryBuilder::for(Category::class)
+            ->allowedFilters(['name', 'description'])
+            ->allowedSorts('name')
+            ->defaultSort('name');
     }
+
+    public function allPaginated(int $perPage = 10)
+    {
+        return $this->getQuery()
+            ->paginate($perPage)
+            ->appends(request()->query());
+    }
+
 
     public function getAll()
     {
-        return Category::query()->orderBy('name')->get();
+        return $this->getQuery()->get();
+    }
+
+    public function findWithProducts(int $id)
+    {
+        return $this->getQuery()
+            ->findOrFail($id);
     }
 
     public function create(array $data): Category
     {
         return Category::create($data);
-    }
-
-    public function findWithProducts(int $id): Category
-    {
-        return Category::withCount('products')->findOrFail($id);
     }
 
     public function update(Category $category, array $data): Category

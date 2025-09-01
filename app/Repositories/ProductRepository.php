@@ -2,55 +2,70 @@
 
 namespace App\Repositories;
 
-use App\Http\Requests\StoreProductRequest;
-use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class ProductRepository
 {
-
-    public function allPaginated(array $filters = [], int $perPage = 10)
-    {
-        $query = Product::with('category:id,name');
-
-        if (!empty($filters['name'])) {
-            $query->withName($filters['name']);
-        }
-
-        if (!empty($filters['price'])) {
-            $query->withPrice($filters['price']);
-        }
-
-        if (!empty($filters['stock'])) {
-            $query->withStock($filters['stock']);
-        }
-
-        if (!empty($filters['category_id'])) {
-            $query->withCategory($filters['category_id']);
-        }
-
-        return $query->latest()->paginate($perPage);
+    private function getQuery(){
+        return QueryBuilder::for(Product::class)
+            ->with('category:id,name')
+            ->allowedFilters([
+                AllowedFilter::partial('name'),
+                AllowedFilter::exact('price'),
+                AllowedFilter::exact('stock'),
+                AllowedFilter::exact('category_id'),
+            ])
+            ->latest();
     }
 
+    public function getAll()
+    {
+        return $this->getQuery()->get();
+    }
+
+
+    /**
+     * Get paginated products with filters via Spatie Query Builder
+     */
+    public function allPaginated(int $perPage = 10)
+    {
+        return $this->getQuery()
+            ->paginate($perPage)
+            ->appends(request()->query());
+    }
+
+    /**
+     * Load product with category
+     */
     public function findById(Product $product): Product
     {
         return $product->load('category:id,name');
     }
 
+    /**
+     * Create a new product
+     */
     public function create(array $data): Product
     {
         return Product::create($data);
     }
 
-    public function update(UpdateProductRequest $request, Product $product): Product
+    /**
+     * Update product
+     */
+    public function update(array $data, Product $product): Product
     {
-        $product->update($request->validated());
+        $product->update($data);
         return $product->load('category:id,name');
     }
 
+    /**
+     * Delete product
+     */
     public function delete(Product $product)
     {
         $product->delete();
-        return response()->noContent();
     }
 }
