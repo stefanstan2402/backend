@@ -3,8 +3,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import api from "../services/api";
 import DataTable from "../components/DataTable.vue";
-import FilterSidebar from "../components/FilterSidebar.vue"; // ⬅️ add
-import { filtersConfig } from "../config/filtersConfig";            // ⬅️ add
+import FilterSidebar from "../components/FilterSidebar.vue";
 
 interface Category {
     id: number;
@@ -18,16 +17,15 @@ const loading = ref(false);
 const router = useRouter();
 
 const filtersVisible = ref(false);
-const filters = ref<Record<string, any>>({});
-
-const filterFields = filtersConfig.categories ?? [
-    { field: "name", type: "text", label: "Name" },
-    { field: "description", type: "text", label: "Description" },
-];
+const filters = ref<Record<string, any>>({
+    name: "",
+    description: "",
+});
 
 const fetchCategories = async (page = 1) => {
     loading.value = true;
     try {
+
         const { data } = await api.post(`/categories/get?page=${page}`, {
             ...filters.value,
         });
@@ -41,14 +39,24 @@ const fetchCategories = async (page = 1) => {
     }
 };
 
-const applyFilters = (newFilters: Record<string, any>) => {
-    filters.value = newFilters;
-    fetchCategories(1); // reset to first page on new filters
+const applyFilters = () => {
+    fetchCategories(1);
+    filtersVisible.value = false;
+};
+
+const resetFilters = () => {
+    filters.value = { name: "", description: "" };
+    fetchCategories(1);
 };
 
 const deleteCategory = async (id: number) => {
     if (confirm("Delete this category?")) {
-        await api.delete(`/categories/${id}`);
+        try {
+            await api.delete(`/categories/${id}`);
+        } catch (error) {
+            console.log(error);
+        }
+
         await fetchCategories(pagination.value.current_page);
     }
 };
@@ -63,14 +71,14 @@ onMounted(() => fetchCategories());
         <div class="flex justify-between items-center mb-4 mx-5">
             <button
                 @click="router.push('/categories/new')"
-                class="bg-green-500 px-3 py-1 rounded btn btn-success"
+                class="bg-green-500 px-3 rounded btn btn-success"
             >
                 + Add Category
             </button>
 
             <button
                 @click="filtersVisible = true"
-                class="bg-gray-600 px-3 py-1 btn btn-secondary mx-1"
+                class="bg-gray-600 px-3 btn btn-secondary mx-1"
             >
                 🔍 Filters
             </button>
@@ -78,10 +86,10 @@ onMounted(() => fetchCategories());
 
         <DataTable
             :columns="[
-        { key: 'id', label: 'ID' },
-        { key: 'name', label: 'Name' },
-        { key: 'description', label: 'Description' }
-      ]"
+                { key: 'id', label: 'ID' },
+                { key: 'name', label: 'Name' },
+                { key: 'description', label: 'Description' }
+            ]"
             :rows="categories"
             :pagination="pagination"
             :loading="loading"
@@ -89,27 +97,64 @@ onMounted(() => fetchCategories());
         >
             <template #actions="{ row }">
                 <button
-                    @click="router.push(`/categories/${row.id}/edit`)"
                     class="bg-blue-500 px-2 py-1 rounded btn btn-warning mx-1"
+                    @click="router.push(`/categories/${row.id}/edit`)"
                 >
                     Edit
                 </button>
                 <button
-                    @click="deleteCategory(row.id)"
                     class="bg-red-500 px-2 py-1 rounded btn btn-danger mx-1"
+                    @click="deleteCategory(row.id)"
                 >
                     Delete
                 </button>
             </template>
         </DataTable>
 
-        <!-- ⬇️ new: reusable filter sidebar -->
+        <!-- Filter Sidebar -->
         <FilterSidebar
-            :visible="filtersVisible"
-            :filters="filterFields"
-            :model-value="filters"
+            v-model:visible="filtersVisible"
+            :modelValue="filters"
             @apply="applyFilters"
-            @update:visible="v => (filtersVisible = v)"
-        />
+        >
+            <div class="mb-3">
+                <label for="filterName" class="form-label fw-semibold">Name</label>
+                <input
+                    v-model="filters.name"
+                    type="text"
+                    id="filterName"
+                    class="form-control shadow-sm"
+                    placeholder="Enter name"
+                />
+            </div>
+
+            <div class="mb-3">
+                <label for="filterDescription" class="form-label fw-semibold">Description</label>
+                <input
+                    v-model="filters.description"
+                    type="text"
+                    id="filterDescription"
+                    class="form-control shadow-sm"
+                    placeholder="Enter description"
+                />
+            </div>
+
+            <!-- Slot for action buttons -->
+
+            <template #actions>
+                <button
+                    class="btn btn-secondary w-100 mt-2"
+                    @click="resetFilters"
+                >
+                    Reset
+                </button>
+                <button
+                    class="btn btn-primary w-100 mt-2"
+                    @click="applyFilters"
+                >
+                    Apply
+                </button>
+            </template>
+        </FilterSidebar>
     </div>
 </template>

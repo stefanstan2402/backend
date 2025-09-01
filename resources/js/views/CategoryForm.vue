@@ -44,7 +44,8 @@ const saveCategory = async () => {
                     "Accept": "application/json",
                     "Content-Type": "application/json"
                 }
-            });notify({
+            });
+            notify({
                 type: "success",
                 title: "Categorie salvata cu succes!",
                 text: "Success!",

@@ -1,60 +1,30 @@
 <template>
-    <!-- Overlay -->
     <div
         v-if="visible"
         class="filter-overlay"
         @click="closeSidebar"
     ></div>
 
-    <!-- Sidebar -->
     <div
         class="filter-sidebar"
         :class="{ 'filter-sidebar--visible': visible }"
     >
         <h4 class="mb-4">Filters</h4>
 
-        <div v-for="filter in filters" :key="filter.field" class="mb-3">
-            <label class="form-label">{{ filter.label }}</label>
+        <slot>
+            <p>No filters defined.</p>
+        </slot>
 
-            <!-- Text filter -->
-            <input
-                v-if="filter.type === 'text'"
-                type="text"
-                class="form-control"
-                v-model="localFilters[filter.field]"
-            />
-
-            <!-- Number filter -->
-            <input
-                v-if="filter.type === 'number'"
-                type="number"
-                class="form-control"
-                v-model.number="localFilters[filter.field]"
-            />
-
-            <!-- Options filter -->
-            <select
-                v-if="filter.type === 'options'"
-                class="form-select"
-                v-model="localFilters[filter.field]"
-            >
-                <option value="">Select {{ filter.label }}</option>
-                <option
-                    v-for="option in filter.options"
-                    :key="option.id"
-                    :value="option.id"
-                >
-                    {{ option.name }}
-                </option>
-            </select>
+        <div class="mt-4 flex flex-col gap-2">
+            <slot name="actions">
+                <button class="btn btn-primary w-100" @click="applyDefault">
+                    Apply
+                </button>
+                <button class="btn btn-secondary w-100" @click="closeSidebar">
+                    Cancel
+                </button>
+            </slot>
         </div>
-
-        <button class="btn btn-primary w-100 mt-3" @click="applyFilters">
-            Apply
-        </button>
-        <button class="btn btn-secondary w-100 mt-2" @click="closeSidebar">
-            Cancel
-        </button>
     </div>
 </template>
 
@@ -63,7 +33,6 @@ import { reactive, watch } from "vue";
 
 const props = defineProps({
     visible: { type: Boolean, default: false },
-    filters: { type: Array, default: () => [] },
     modelValue: { type: Object, default: () => ({}) },
 });
 
@@ -78,7 +47,7 @@ watch(
     }
 );
 
-const applyFilters = () => {
+const applyDefault = () => {
     emit("apply", { ...localFilters });
     emit("update:visible", false);
 };
@@ -89,7 +58,6 @@ const closeSidebar = () => {
 </script>
 
 <style scoped>
-/* Overlay with blur */
 .filter-overlay {
     position: fixed;
     top: 0;
@@ -101,11 +69,10 @@ const closeSidebar = () => {
     z-index: 1040;
 }
 
-/* Sidebar container */
 .filter-sidebar {
     position: fixed;
     top: 0;
-    right: -400px; /* hide initially */
+    right: -400px;
     width: 350px;
     height: 100vh;
     background: #f8f9fa;
@@ -116,7 +83,6 @@ const closeSidebar = () => {
     overflow-y: auto;
 }
 
-/* Slide in when visible */
 .filter-sidebar--visible {
     right: 0;
 }
