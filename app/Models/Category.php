@@ -15,12 +15,12 @@ class Category extends Model
     }
 
     // Scopes
-    public function scopeWithName(Builder $query, string $name): Builder
+    public function scopeName(Builder $query, string $name): Builder
     {
         return $query->where('name', 'like', '%' . $name . '%');
     }
 
-    public function scopeWithDescription(Builder $query, string $description): Builder
+    public function scopeDescription(Builder $query, string $description): Builder
     {
         return $query->where('description', 'like', '%' . $description . '%');
     }

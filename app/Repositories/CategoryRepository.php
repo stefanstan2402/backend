@@ -11,7 +11,7 @@ class CategoryRepository
     private function getQuery()
     {
         return QueryBuilder::for(Category::class)
-            ->allowedFilters(['name', 'description'])
+            ->allowedFilters([AllowedFilter::scope('name'), AllowedFilter::scope('description')])
             ->allowedSorts('name')
             ->defaultSort('name');
     }

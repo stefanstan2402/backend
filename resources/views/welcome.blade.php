@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Category and product app</title>
+        <title>Categories and products app</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
