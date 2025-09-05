@@ -7,6 +7,6 @@ export const filtersConfig = {
         name: "filter[name]",
         price: "filter[price]",
         stock: "filter[stock]",
-        category: "filter[category]",
+        category_id: "filter[category_id]",
     },
 };

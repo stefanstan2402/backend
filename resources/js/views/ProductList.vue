@@ -29,7 +29,7 @@ const filters = ref<Record<string, any>>({
     name: "",
     price: null,
     stock: null,
-    category_id: "",
+    category_id: null,
 });
 
 const categories = ref<Category[]>([]);
@@ -44,7 +44,7 @@ const fetchProducts = async (page = 1) => {
     try {
         const params: Record<string, any> = {
             page,
-            ...buildQueryParams(filters.value, filtersConfig.categories)
+            ...buildQueryParams(filters.value, filtersConfig.products)
         };
 
         const { data } = await api.get("/products/get", { params });

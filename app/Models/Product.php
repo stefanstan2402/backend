@@ -15,22 +15,22 @@ class Product extends Model
     }
 
     // --- Scopes ---
-    public function scopeWithName(Builder $query, string $name): Builder
+    public function scopeName(Builder $query, string $name): Builder
     {
         return $query->where('name', 'like', '%' . $name . '%');
     }
 
-    public function scopeWithPrice(Builder $query, string $price): Builder
+    public function scopePrice(Builder $query, int $price): Builder
     {
         return $query->where('price', $price);
     }
 
-    public function scopeWithStock(Builder $query, string $stock): Builder
+    public function scopeStock(Builder $query, int $stock): Builder
     {
         return $query->where('stock', $stock);
     }
 
-    public function scopeWithCategory(Builder $query, string $categoryId): Builder
+    public function scopeCategoryId(Builder $query, int $categoryId): Builder
     {
         return $query->where('category_id', $categoryId);
     }

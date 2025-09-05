@@ -12,10 +12,10 @@ class ProductRepository
         return QueryBuilder::for(Product::class)
             ->with('category:id,name')
             ->allowedFilters([
-                AllowedFilter::partial('name'),
-                AllowedFilter::exact('price'),
-                AllowedFilter::exact('stock'),
-                AllowedFilter::exact('category_id'),
+                AllowedFilter::scope('name'),
+                AllowedFilter::scope('price'),
+                AllowedFilter::scope('stock'),
+                AllowedFilter::scope('category_id')
             ])
             ->latest();
     }
